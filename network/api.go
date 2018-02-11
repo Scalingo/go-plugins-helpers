@@ -1,10 +1,13 @@
 package network
 
 import (
-	"log"
+	"context"
+	"errors"
 	"net/http"
 
-	"github.com/docker/go-plugins-helpers/sdk"
+	"github.com/Scalingo/go-plugins-helpers/sdk"
+	"github.com/Scalingo/go-utils/logger"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,20 +35,20 @@ const (
 
 // Driver represent the interface a driver must fulfill.
 type Driver interface {
-	GetCapabilities() (*CapabilitiesResponse, error)
-	CreateNetwork(*CreateNetworkRequest) error
-	AllocateNetwork(*AllocateNetworkRequest) (*AllocateNetworkResponse, error)
-	DeleteNetwork(*DeleteNetworkRequest) error
-	FreeNetwork(*FreeNetworkRequest) error
-	CreateEndpoint(*CreateEndpointRequest) (*CreateEndpointResponse, error)
-	DeleteEndpoint(*DeleteEndpointRequest) error
-	EndpointInfo(*InfoRequest) (*InfoResponse, error)
-	Join(*JoinRequest) (*JoinResponse, error)
-	Leave(*LeaveRequest) error
-	DiscoverNew(*DiscoveryNotification) error
-	DiscoverDelete(*DiscoveryNotification) error
-	ProgramExternalConnectivity(*ProgramExternalConnectivityRequest) error
-	RevokeExternalConnectivity(*RevokeExternalConnectivityRequest) error
+	GetCapabilities(context.Context) (*CapabilitiesResponse, error)
+	CreateNetwork(context.Context, *CreateNetworkRequest) error
+	AllocateNetwork(context.Context, *AllocateNetworkRequest) (*AllocateNetworkResponse, error)
+	DeleteNetwork(context.Context, *DeleteNetworkRequest) error
+	FreeNetwork(context.Context, *FreeNetworkRequest) error
+	CreateEndpoint(context.Context, *CreateEndpointRequest) (*CreateEndpointResponse, error)
+	DeleteEndpoint(context.Context, *DeleteEndpointRequest) error
+	EndpointInfo(context.Context, *InfoRequest) (*InfoResponse, error)
+	Join(context.Context, *JoinRequest) (*JoinResponse, error)
+	Leave(context.Context, *LeaveRequest) error
+	DiscoverNew(context.Context, *DiscoveryNotification) error
+	DiscoverDelete(context.Context, *DiscoveryNotification) error
+	ProgramExternalConnectivity(context.Context, *ProgramExternalConnectivityRequest) error
+	RevokeExternalConnectivity(context.Context, *RevokeExternalConnectivityRequest) error
 }
 
 // CapabilitiesResponse returns whether or not this network is global or local
@@ -213,194 +216,239 @@ type Handler struct {
 }
 
 // NewHandler initializes the request handler with a driver implementation.
-func NewHandler(driver Driver) *Handler {
-	h := &Handler{driver, sdk.NewHandler(manifest)}
+func NewHandler(logger logrus.FieldLogger, driver Driver) *Handler {
+	h := &Handler{driver, sdk.NewHandler(logger, manifest)}
 	h.initMux()
 	return h
 }
 
 func (h *Handler) initMux() {
-	h.HandleFunc(capabilitiesPath, func(w http.ResponseWriter, r *http.Request) {
-		res, err := h.driver.GetCapabilities()
+	h.HandleFunc(capabilitiesPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
+		res, err := h.driver.GetCapabilities(r.Context())
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		if res == nil {
-			sdk.EncodeResponse(w, NewErrorResponse("Network driver must implement GetCapabilities"), true)
-			return
+			err := errors.New("Network driver must implement GetCapabilities")
+			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(createNetworkPath, func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Entering go-plugins-helpers createnetwork")
+	h.HandleFunc(createNetworkPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &CreateNetworkRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.CreateNetwork(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id": req.NetworkID,
+		}))
+		err = h.driver.CreateNetwork(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(allocateNetworkPath, func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Entering go-plugins-helpers allocatenetwork")
+	h.HandleFunc(allocateNetworkPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &AllocateNetworkRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		res, err := h.driver.AllocateNetwork(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id": req.NetworkID,
+		}))
+		res, err := h.driver.AllocateNetwork(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(deleteNetworkPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(deleteNetworkPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &DeleteNetworkRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.DeleteNetwork(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id": req.NetworkID,
+		}))
+		err = h.driver.DeleteNetwork(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(freeNetworkPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(freeNetworkPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &FreeNetworkRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.FreeNetwork(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id": req.NetworkID,
+		}))
+		err = h.driver.FreeNetwork(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(createEndpointPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(createEndpointPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &CreateEndpointRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		res, err := h.driver.CreateEndpoint(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id":  req.NetworkID,
+			"docker_endpoint_id": req.EndpointID,
+		}))
+		res, err := h.driver.CreateEndpoint(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(deleteEndpointPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(deleteEndpointPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &DeleteEndpointRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.DeleteEndpoint(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id":  req.NetworkID,
+			"docker_endpoint_id": req.EndpointID,
+		}))
+		err = h.driver.DeleteEndpoint(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(endpointInfoPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(endpointInfoPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &InfoRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		res, err := h.driver.EndpointInfo(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id":  req.NetworkID,
+			"docker_endpoint_id": req.EndpointID,
+		}))
+		res, err := h.driver.EndpointInfo(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(joinPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(joinPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &JoinRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		res, err := h.driver.Join(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id":  req.NetworkID,
+			"docker_endpoint_id": req.EndpointID,
+		}))
+		res, err := h.driver.Join(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(leavePath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(leavePath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &LeaveRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.Leave(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_network_id":  req.NetworkID,
+			"docker_endpoint_id": req.EndpointID,
+		}))
+		err = h.driver.Leave(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(discoverNewPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(discoverNewPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &DiscoveryNotification{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.DiscoverNew(req)
+		err = h.driver.DiscoverNew(r.Context(), req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(discoverDeletePath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(discoverDeletePath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &DiscoveryNotification{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.DiscoverDelete(req)
+		err = h.driver.DiscoverDelete(r.Context(), req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(programExtConnPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(programExtConnPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &ProgramExternalConnectivityRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.ProgramExternalConnectivity(req)
+		err = h.driver.ProgramExternalConnectivity(r.Context(), req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(revokeExtConnPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(revokeExtConnPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &RevokeExternalConnectivityRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.driver.RevokeExternalConnectivity(req)
+		err = h.driver.RevokeExternalConnectivity(r.Context(), req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
 }

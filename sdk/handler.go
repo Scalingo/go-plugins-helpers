@@ -6,6 +6,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+
+	"github.com/Scalingo/go-handlers"
+	"github.com/sirupsen/logrus"
 )
 
 const activatePath = "/Plugin.Activate"
@@ -13,16 +16,18 @@ const activatePath = "/Plugin.Activate"
 // Handler is the base to create plugin handlers.
 // It initializes connections and sockets to listen to.
 type Handler struct {
-	mux *http.ServeMux
+	mux *handlers.Router
 }
 
 // NewHandler creates a new Handler with an http mux.
-func NewHandler(manifest string) Handler {
-	mux := http.NewServeMux()
+func NewHandler(logger logrus.FieldLogger, manifest string) Handler {
+	mux := handlers.NewRouter(logger)
+	mux.Use(handlers.ErrorMiddleware)
 
-	mux.HandleFunc(activatePath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(activatePath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		w.Header().Set("Content-Type", DefaultContentTypeV1_1)
 		fmt.Fprintln(w, manifest)
+		return nil
 	})
 
 	return Handler{mux: mux}
@@ -83,6 +88,6 @@ func (h Handler) ServeWindows(addr, pluginName, daemonDir string, pipeConfig *Wi
 }
 
 // HandleFunc registers a function to handle a request path with.
-func (h Handler) HandleFunc(path string, fn func(w http.ResponseWriter, r *http.Request)) {
+func (h Handler) HandleFunc(path string, fn handlers.HandlerFunc) {
 	h.mux.HandleFunc(path, fn)
 }
