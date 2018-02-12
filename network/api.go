@@ -222,11 +222,10 @@ func NewHandler(logger logrus.FieldLogger, driver Driver) *Handler {
 	return h
 }
 
-// NewHandlerWithSDKHandler initializes the request handler with a driver implementation and a given sdk.Handler
-func NewHandlerWithSDKHandler(driver Driver, sdkhandler sdk.Handler) *Handler {
+// ConfigureHandler adds routes to the sdk.Handler to handle the network plugin API
+func NewHandlerWithSDKHandler(sdkhandler sdk.Handler, driver Driver) {
 	h := &Handler{driver, sdkhandler}
 	h.initMux()
-	return h
 }
 
 func (h *Handler) initMux() {

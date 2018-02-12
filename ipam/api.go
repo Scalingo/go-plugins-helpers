@@ -104,11 +104,10 @@ func NewHandler(logger logrus.FieldLogger, driver Ipam) *Handler {
 	return h
 }
 
-// NewHandlerWithSDKHandler initializes the request handler with a driver implementation and a given sdk.Handler
-func NewHandlerWithSDKHandler(driver Ipam, sdkhandler sdk.Handler) *Handler {
+// ConfigureHandler adds routes to the sdk.Handler to handle the Ipam plugin API
+func ConfigureHandler(sdkhandler sdk.Handler, driver Ipam) {
 	h := &Handler{driver, sdkhandler}
 	h.initMux()
-	return h
 }
 
 func (h *Handler) initMux() {
