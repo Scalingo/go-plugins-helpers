@@ -222,6 +222,13 @@ func NewHandler(logger logrus.FieldLogger, driver Driver) *Handler {
 	return h
 }
 
+// NewHandlerWithSDKHandler initializes the request handler with a driver implementation and a given sdk.Handler
+func NewHandlerWithSDKHandler(driver Driver, sdkhandler sdk.Handler) *Handler {
+	h := &Handler{driver, sdkhandler}
+	h.initMux()
+	return h
+}
+
 func (h *Handler) initMux() {
 	h.HandleFunc(capabilitiesPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		res, err := h.driver.GetCapabilities(r.Context())

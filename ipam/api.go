@@ -1,9 +1,12 @@
 package ipam
 
 import (
+	"context"
 	"net/http"
 
-	"github.com/docker/go-plugins-helpers/sdk"
+	"github.com/Scalingo/go-plugins-helpers/sdk"
+	"github.com/Scalingo/go-utils/logger"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -19,12 +22,12 @@ const (
 
 // Ipam represent the interface a driver must fulfill.
 type Ipam interface {
-	GetCapabilities() (*CapabilitiesResponse, error)
-	GetDefaultAddressSpaces() (*AddressSpacesResponse, error)
-	RequestPool(*RequestPoolRequest) (*RequestPoolResponse, error)
-	ReleasePool(*ReleasePoolRequest) error
-	RequestAddress(*RequestAddressRequest) (*RequestAddressResponse, error)
-	ReleaseAddress(*ReleaseAddressRequest) error
+	GetCapabilities(context.Context) (*CapabilitiesResponse, error)
+	GetDefaultAddressSpaces(context.Context) (*AddressSpacesResponse, error)
+	RequestPool(context.Context, *RequestPoolRequest) (*RequestPoolResponse, error)
+	ReleasePool(context.Context, *ReleasePoolRequest) error
+	RequestAddress(context.Context, *RequestAddressRequest) (*RequestAddressResponse, error)
+	ReleaseAddress(context.Context, *ReleaseAddressRequest) error
 }
 
 // CapabilitiesResponse returns whether or not this IPAM required pre-made MAC
@@ -95,79 +98,108 @@ type Handler struct {
 }
 
 // NewHandler initializes the request handler with a driver implementation.
-func NewHandler(ipam Ipam) *Handler {
-	h := &Handler{ipam, sdk.NewHandler(manifest)}
+func NewHandler(logger logrus.FieldLogger, driver Ipam) *Handler {
+	h := &Handler{driver, sdk.NewHandler(logger, manifest)}
+	h.initMux()
+	return h
+}
+
+// NewHandlerWithSDKHandler initializes the request handler with a driver implementation and a given sdk.Handler
+func NewHandlerWithSDKHandler(driver Ipam, sdkhandler sdk.Handler) *Handler {
+	h := &Handler{driver, sdkhandler}
 	h.initMux()
 	return h
 }
 
 func (h *Handler) initMux() {
-	h.HandleFunc(capabilitiesPath, func(w http.ResponseWriter, r *http.Request) {
-		res, err := h.ipam.GetCapabilities()
+	h.HandleFunc(capabilitiesPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
+		res, err := h.ipam.GetCapabilities(r.Context())
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(addressSpacesPath, func(w http.ResponseWriter, r *http.Request) {
-		res, err := h.ipam.GetDefaultAddressSpaces()
+	h.HandleFunc(addressSpacesPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
+		res, err := h.ipam.GetDefaultAddressSpaces(r.Context())
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(requestPoolPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(requestPoolPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &RequestPoolRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		res, err := h.ipam.RequestPool(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_address_space": req.AddressSpace,
+			"docker_pool":          req.Pool,
+			"docker_subpool":       req.SubPool,
+		}))
+		res, err := h.ipam.RequestPool(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(releasePoolPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(releasePoolPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &ReleasePoolRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return nil
 		}
-		err = h.ipam.ReleasePool(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_pool_id": req.PoolID,
+		}))
+		err = h.ipam.ReleasePool(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
-	h.HandleFunc(requestAddressPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(requestAddressPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &RequestAddressRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		res, err := h.ipam.RequestAddress(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_pool_id": req.PoolID,
+			"docker_address": req.Address,
+		}))
+		res, err := h.ipam.RequestAddress(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, res, false)
+		return nil
 	})
-	h.HandleFunc(releaseAddressPath, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(releaseAddressPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		req := &ReleaseAddressRequest{}
 		err := sdk.DecodeRequest(w, r, req)
 		if err != nil {
-			return
+			return err
 		}
-		err = h.ipam.ReleaseAddress(req)
+		ctx := logger.ToCtx(r.Context(), logger.Get(r.Context()).WithFields(logrus.Fields{
+			"docker_pool_id": req.PoolID,
+			"docker_address": req.Address,
+		}))
+		err = h.ipam.ReleaseAddress(ctx, req)
 		if err != nil {
 			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
-			return
+			return err
 		}
 		sdk.EncodeResponse(w, struct{}{}, false)
+		return nil
 	})
 }
