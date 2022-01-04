@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -197,13 +198,19 @@ func TestCreateNetworkError(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if response.StatusCode != http.StatusInternalServerError {
 		t.Fatalf("Expected 500, got %d\n", response.StatusCode)
 	}
-	if string(body) != "{\"Err\":\"I CAN HAZ ERRORZ\"}\n" {
-		t.Fatalf("Expected %s, got %s\n", "{\"Err\":\"I CAN HAZ ERRORZ\"}\n", string(body))
+
+	fmt.Printf("\n\nBINIOU: %v\n\n\n", string(body))
+	expectedBody := "{\"Err\":\"I CAN HAZ ERRORZ\"}\n"
+	if string(body) != expectedBody {
+		t.Fatalf("Expected %s, got %s\n", expectedBody, string(body))
 	}
 }
 
