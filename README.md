@@ -12,7 +12,21 @@ A collection of helper packages to extend Docker Engine in Go
 
 See the [understand Docker plugins documentation section](https://docs.docker.com/engine/extend/plugins/).
 
-### Release a New Version
+## Test Environment
+
+It is possible to execute the tests in a Docker environment by running:
+
+```shell
+make test
+```
+
+In a non-Docker environment, you may want to define the environment variable `PLUGIN_SPEC_DIR` to a user-writable folder such as:
+
+```shell
+PLUGIN_SPEC_DIR=$(pwd)/_dev go test -v ./...
+```
+
+## Release a New Version
 
 Bump new version number in:
 
