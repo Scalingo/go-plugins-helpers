@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package sdk
@@ -7,8 +8,6 @@ import (
 	"os"
 	"syscall"
 	"unsafe"
-
-	"github.com/Microsoft/go-winio"
 )
 
 // Named pipes use Windows Security Descriptor Definition Language to define ACL. Following are
