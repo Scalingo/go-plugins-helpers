@@ -128,11 +128,23 @@ func callURL(url string) {
 func TestMain(m *testing.M) {
 	d := &TestDriver{}
 	h1 := NewHandler(logrus.FieldLogger(logger.Default()), d)
-	go h1.ServeTCP("test", "localhost:32234", "", nil)
+	go func() {
+		err := h1.ServeTCP("test", "localhost:32234", "", nil)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error setting up the TCP server: %v\n", err)
+			os.Exit(-1)
+		}
+	}()
 
 	e := &ErrDriver{}
 	h2 := NewHandler(logrus.FieldLogger(logger.Default()), e)
-	go h2.ServeTCP("err", "localhost:32567", "", nil)
+	go func() {
+		err := h2.ServeTCP("test", "localhost:32567", "", nil)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error setting up the TCP server: %v\n", err)
+			os.Exit(-1)
+		}
+	}()
 
 	// Test that the ServeTCP is ready for use.
 	callURL("http://localhost:32234/Plugin.Activate")

@@ -224,7 +224,13 @@ func callURL(url string) {
 func TestMain(m *testing.M) {
 	d := &TestPlugin{}
 	h := NewHandler(d)
-	go h.ServeTCP("test", "localhost:32456", "", nil)
+	go func() {
+		err := h.ServeTCP("test", "localhost:32456", "", nil)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error setting up the TCP server: %v\n", err)
+			os.Exit(-1)
+		}
+	}()
 
 	callURL("http://localhost:32456/Plugin.Activate")
 
