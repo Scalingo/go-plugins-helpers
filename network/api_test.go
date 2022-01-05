@@ -219,7 +219,6 @@ func TestCreateNetworkError(t *testing.T) {
 		t.Fatalf("Expected 500, got %d\n", response.StatusCode)
 	}
 
-	fmt.Printf("\n\nBINIOU: %v\n\n\n", string(body))
 	expectedBody := "{\"Err\":\"I CAN HAZ ERRORZ\"}\n"
 	if string(body) != expectedBody {
 		t.Fatalf("Expected %s, got %s\n", expectedBody, string(body))
