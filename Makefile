@@ -1,9 +1,9 @@
 .PHONY: all test test-local install-deps lint fmt vet
 
 REPO_NAME = go-plugins-helpers
-REPO_OWNER = docker
+REPO_OWNER = Scalingo
 PKG_NAME = github.com/${REPO_OWNER}/${REPO_NAME}
-IMAGE = golang:1.15
+IMAGE = golang:1.16
 
 all: test
 

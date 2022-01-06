@@ -1,8 +1,10 @@
 package network
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -11,41 +13,44 @@ import (
 	"time"
 
 	"github.com/docker/go-plugins-helpers/sdk"
+	"github.com/sirupsen/logrus"
+
+	"github.com/Scalingo/go-utils/logger"
 )
 
 type TestDriver struct {
 	Driver
 }
 
-func (t *TestDriver) GetCapabilities() (*CapabilitiesResponse, error) {
+func (t *TestDriver) GetCapabilities(_ context.Context) (*CapabilitiesResponse, error) {
 	return &CapabilitiesResponse{Scope: LocalScope, ConnectivityScope: GlobalScope}, nil
 }
 
-func (t *TestDriver) CreateNetwork(r *CreateNetworkRequest) error {
+func (t *TestDriver) CreateNetwork(_ context.Context, r *CreateNetworkRequest) error {
 	return nil
 }
 
-func (t *TestDriver) DeleteNetwork(r *DeleteNetworkRequest) error {
+func (t *TestDriver) DeleteNetwork(_ context.Context, r *DeleteNetworkRequest) error {
 	return nil
 }
 
-func (t *TestDriver) CreateEndpoint(r *CreateEndpointRequest) (*CreateEndpointResponse, error) {
+func (t *TestDriver) CreateEndpoint(_ context.Context, r *CreateEndpointRequest) (*CreateEndpointResponse, error) {
 	return &CreateEndpointResponse{}, nil
 }
 
-func (t *TestDriver) DeleteEndpoint(r *DeleteEndpointRequest) error {
+func (t *TestDriver) DeleteEndpoint(_ context.Context, r *DeleteEndpointRequest) error {
 	return nil
 }
 
-func (t *TestDriver) Join(r *JoinRequest) (*JoinResponse, error) {
+func (t *TestDriver) Join(_ context.Context, r *JoinRequest) (*JoinResponse, error) {
 	return &JoinResponse{}, nil
 }
 
-func (t *TestDriver) Leave(r *LeaveRequest) error {
+func (t *TestDriver) Leave(_ context.Context, r *LeaveRequest) error {
 	return nil
 }
 
-func (t *TestDriver) ProgramExternalConnectivity(r *ProgramExternalConnectivityRequest) error {
+func (t *TestDriver) ProgramExternalConnectivity(_ context.Context, r *ProgramExternalConnectivityRequest) error {
 	i := r.Options["com.docker.network.endpoint.exposedports"]
 	epl, ok := i.([]interface{})
 	if !ok {
@@ -61,7 +66,7 @@ func (t *TestDriver) ProgramExternalConnectivity(r *ProgramExternalConnectivityR
 	return nil
 }
 
-func (t *TestDriver) RevokeExternalConnectivity(r *RevokeExternalConnectivityRequest) error {
+func (t *TestDriver) RevokeExternalConnectivity(_ context.Context, r *RevokeExternalConnectivityRequest) error {
 	return nil
 }
 
@@ -69,31 +74,31 @@ type ErrDriver struct {
 	Driver
 }
 
-func (e *ErrDriver) GetCapabilities() (*CapabilitiesResponse, error) {
+func (e *ErrDriver) GetCapabilities(_ context.Context) (*CapabilitiesResponse, error) {
 	return nil, fmt.Errorf("I CAN HAZ ERRORZ")
 }
 
-func (e *ErrDriver) CreateNetwork(r *CreateNetworkRequest) error {
+func (e *ErrDriver) CreateNetwork(_ context.Context, r *CreateNetworkRequest) error {
 	return fmt.Errorf("I CAN HAZ ERRORZ")
 }
 
-func (e *ErrDriver) DeleteNetwork(r *DeleteNetworkRequest) error {
+func (e *ErrDriver) DeleteNetwork(_ context.Context, r *DeleteNetworkRequest) error {
 	return errors.New("I CAN HAZ ERRORZ")
 }
 
-func (e *ErrDriver) CreateEndpoint(r *CreateEndpointRequest) (*CreateEndpointResponse, error) {
+func (e *ErrDriver) CreateEndpoint(_ context.Context, r *CreateEndpointRequest) (*CreateEndpointResponse, error) {
 	return nil, errors.New("I CAN HAZ ERRORZ")
 }
 
-func (e *ErrDriver) DeleteEndpoint(r *DeleteEndpointRequest) error {
+func (e *ErrDriver) DeleteEndpoint(_ context.Context, r *DeleteEndpointRequest) error {
 	return errors.New("I CAN HAZ ERRORZ")
 }
 
-func (e *ErrDriver) Join(r *JoinRequest) (*JoinResponse, error) {
+func (e *ErrDriver) Join(_ context.Context, r *JoinRequest) (*JoinResponse, error) {
 	return nil, errors.New("I CAN HAZ ERRORZ")
 }
 
-func (e *ErrDriver) Leave(r *LeaveRequest) error {
+func (e *ErrDriver) Leave(_ context.Context, r *LeaveRequest) error {
 	return errors.New("I CAN HAZ ERRORZ")
 }
 
@@ -122,12 +127,24 @@ func callURL(url string) {
 
 func TestMain(m *testing.M) {
 	d := &TestDriver{}
-	h1 := NewHandler(d)
-	go h1.ServeTCP("test", "localhost:32234", "", nil)
+	h1 := NewHandler(logrus.FieldLogger(logger.Default()), d)
+	go func() {
+		err := h1.ServeTCP("test", "localhost:32234", "", nil)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error setting up the TCP server: %v\n", err)
+			os.Exit(-1)
+		}
+	}()
 
 	e := &ErrDriver{}
-	h2 := NewHandler(e)
-	go h2.ServeTCP("err", "localhost:32567", "", nil)
+	h2 := NewHandler(logrus.FieldLogger(logger.Default()), e)
+	go func() {
+		err := h2.ServeTCP("test", "localhost:32567", "", nil)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error setting up the TCP server: %v\n", err)
+			os.Exit(-1)
+		}
+	}()
 
 	// Test that the ServeTCP is ready for use.
 	callURL("http://localhost:32234/Plugin.Activate")
@@ -193,13 +210,18 @@ func TestCreateNetworkError(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if response.StatusCode != http.StatusInternalServerError {
 		t.Fatalf("Expected 500, got %d\n", response.StatusCode)
 	}
-	if string(body) != "{\"Err\":\"I CAN HAZ ERRORZ\"}\n" {
-		t.Fatalf("Expected %s, got %s\n", "{\"Err\":\"I CAN HAZ ERRORZ\"}\n", string(body))
+
+	expectedBody := "{\"Err\":\"I CAN HAZ ERRORZ\"}\n"
+	if string(body) != expectedBody {
+		t.Fatalf("Expected %s, got %s\n", expectedBody, string(body))
 	}
 }
 
