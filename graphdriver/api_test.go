@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -295,7 +294,7 @@ func (p *testPlugin) Cleanup() error {
 func (p *testPlugin) Diff(string, string) io.ReadCloser {
 	p.diff++
 	b := new(bytes.Buffer)
-	x := ioutil.NopCloser(bytes.NewReader(b.Bytes()))
+	x := io.NopCloser(bytes.NewReader(b.Bytes()))
 	return x
 }
 
