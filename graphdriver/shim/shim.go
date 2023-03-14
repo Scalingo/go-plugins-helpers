@@ -27,7 +27,7 @@ func NewHandlerFromGraphDriver(init graphDriver.InitFunc) *graphPlugin.Handler {
 }
 
 func (d *shimDriver) Init(home string, options []string, uidMaps, gidMaps []idtools.IDMap) error {
-	driver, err := d.init(home, options, uidMaps, gidMaps)
+	driver, err := d.init(home, options, idtools.IdentityMapping{UIDMaps: uidMaps, GIDMaps: gidMaps})
 	if err != nil {
 		return err
 	}

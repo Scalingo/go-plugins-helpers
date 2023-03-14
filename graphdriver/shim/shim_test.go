@@ -55,8 +55,8 @@ func (t *testGraphDriver) Capabilities() graphdriver.Capabilities {
 	return graphdriver.Capabilities{}
 }
 
-func Init(root string, options []string, uidMaps, gidMaps []idtools.IDMap) (graphdriver.Driver, error) {
-	d := graphdriver.NewNaiveDiffDriver(&testGraphDriver{}, uidMaps, gidMaps)
+func Init(root string, options []string, idMap idtools.IdentityMapping) (graphdriver.Driver, error) {
+	d := graphdriver.NewNaiveDiffDriver(&testGraphDriver{}, idMap)
 	return d, nil
 }
 
