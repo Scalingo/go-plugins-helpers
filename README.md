@@ -14,12 +14,6 @@ See the [understand Docker plugins documentation section](https://docs.docker.co
 
 ## Test Environment
 
-It is possible to execute the tests in a Docker environment by running:
-
-```shell
-make test
-```
-
 In a non-Docker environment, you may want to define the environment variable `PLUGIN_SPEC_DIR` to a user-writable folder such as:
 
 ```shell
