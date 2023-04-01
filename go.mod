@@ -7,7 +7,7 @@ require (
 	github.com/Scalingo/go-handlers v1.8.0
 	github.com/Scalingo/go-utils/logger v1.2.0
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
-	github.com/docker/docker v23.0.1+incompatible
+	github.com/docker/docker v23.0.2+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-plugins-helpers v0.0.0-20211224144127-6eecb7beb651
 	github.com/sirupsen/logrus v1.9.0
