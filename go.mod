@@ -3,7 +3,7 @@ module github.com/Scalingo/go-plugins-helpers
 go 1.20
 
 require (
-	github.com/Microsoft/go-winio v0.6.0
+	github.com/Microsoft/go-winio v0.6.1
 	github.com/Scalingo/go-handlers v1.8.0
 	github.com/Scalingo/go-utils/logger v1.2.0
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
