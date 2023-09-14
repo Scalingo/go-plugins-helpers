@@ -8,3 +8,7 @@ updates:
       interval: "monthly"
     reviewers:
       - "Soulou"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
