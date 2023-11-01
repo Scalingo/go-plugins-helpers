@@ -13,8 +13,8 @@ github.com/Scalingo/go-utils/security v1.0.0 h1:BW4FeZKmqW9nmDb/hdm49w4bhznQ8j7c
 github.com/Scalingo/go-utils/security v1.0.0/go.mod h1:vCgqjBdIBSYKxZhFBMT9koEH2MEbzuwmNZyLhmKcnV0=
 github.com/containerd/containerd v1.7.0-beta.2 h1:GWmC96y8j7jlFJX0Wh+covft0M1hHBqQL7lo+N6qvxg=
 github.com/containerd/containerd v1.7.0-beta.2/go.mod h1:RR01Jsm/jovDKK48sFCVqWyKAH2APMPi88Aeu1on63I=
-github.com/containerd/continuity v0.4.2 h1:v3y/4Yz5jwnvqPKJJ+7Wf93fyWoCB3F5EclWG023MDM=
-github.com/containerd/continuity v0.4.2/go.mod h1:F6PTNCKepoxEaXLQp3wDAjygEnImnZ/7o4JzpodfroQ=
+github.com/containerd/continuity v0.4.3 h1:6HVkalIp+2u1ZLH1J/pYX2oBVXlJZvh1X1A7bEZ9Su8=
+github.com/containerd/continuity v0.4.3/go.mod h1:F6PTNCKepoxEaXLQp3wDAjygEnImnZ/7o4JzpodfroQ=
 github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf h1:iW4rZ826su+pqaw19uhpSCzhj44qo35pNgKFGqzDKkU=
 github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=

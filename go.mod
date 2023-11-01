@@ -19,7 +19,7 @@ require (
 	github.com/Scalingo/go-utils/errors/v2 v2.3.0 // indirect
 	github.com/Scalingo/go-utils/security v1.0.0 // indirect
 	github.com/containerd/containerd v1.7.0-beta.2 // indirect
-	github.com/containerd/continuity v0.4.2 // indirect
+	github.com/containerd/continuity v0.4.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/frankban/quicktest v1.14.6 // indirect
