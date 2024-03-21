@@ -7,7 +7,7 @@ updates:
     schedule:
       interval: "monthly"
     reviewers:
-      - "Soulou"
+      - "leo-scalingo"
     groups:
       dependencies:
         patterns:
