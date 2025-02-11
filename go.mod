@@ -1,6 +1,6 @@
 module github.com/Scalingo/go-plugins-helpers
 
-go 1.20
+go 1.23.5
 
 require (
 	github.com/Microsoft/go-winio v0.6.1
