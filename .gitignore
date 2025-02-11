@@ -1,27 +1,17 @@
-# Compiled Object files, Static and Dynamic libs (Shared Objects)
-*.o
-*.a
-*.so
-
-# Folders
-_obj
-_test
-
-# Architecture specific extensions/prefixes
-*.[568vq]
-[568vq].out
-
-*.cgo1.go
-*.cgo2.c
-_cgo_defun.c
-_cgo_gotypes.go
-_cgo_export.*
-
-_testmain.go
-
-*.exe
-*.test
-*.prof
-
+.sass-cache/
 /_dev/plugins
 /_dev/go-cache
+
+# IDE
+.idea/
+
+# MacOS files
+.DS_Store
+.foreman
+
+# Ignore tests binaries
+*.test
+# But take CI env file
+!.env.test
+# environment variables with secrets
+.env*.local
