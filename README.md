@@ -2,13 +2,12 @@
 
 A collection of helper packages to extend Docker Engine in Go
 
- Plugin type   | Documentation | Description
- --------------|---------------|--------------------------------------------------
- Authorization | [Link](https://docs.docker.com/engine/extend/authorization/)   | Extend API authorization mechanism
- Network       | [Link](https://docs.docker.com/engine/extend/plugins_network/) | Extend network management
- Volume        | [Link](https://docs.docker.com/engine/extend/plugins_volume/)  | Extend persistent storage
- IPAM          | [Link](https://github.com/docker/libnetwork/blob/master/docs/ipam.md) | Extend IP address management
- Graph (experimental) | [Link](https://github.com/docker/cli/blob/master/docs/extend/plugins_graphdriver.md)| Extend image and container fs storage
+| Plugin type   | Documentation                                                         | Description                        |
+|---------------|-----------------------------------------------------------------------|------------------------------------|
+| Authorization | [Link](https://docs.docker.com/engine/extend/authorization/)          | Extend API authorization mechanism |
+| Network       | [Link](https://docs.docker.com/engine/extend/plugins_network/)        | Extend network management          |
+| Volume        | [Link](https://docs.docker.com/engine/extend/plugins_volume/)         | Extend persistent storage          |
+| IPAM          | [Link](https://github.com/docker/libnetwork/blob/master/docs/ipam.md) | Extend IP address management       |
 
 See the [understand Docker plugins documentation section](https://docs.docker.com/engine/extend/plugins/).
 
@@ -39,3 +38,5 @@ hub release create v1.3.0
 ```
 
 The title of the release should be the version number and the text of the release is the same as the changelog.
+
+See the [understand Docker plugins documentation section](https://docs.docker.com/engine/extend/).
