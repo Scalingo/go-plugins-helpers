@@ -6,7 +6,9 @@ import (
 	"encoding/pem"
 	"net/http"
 
-	"github.com/docker/go-plugins-helpers/sdk"
+	"github.com/sirupsen/logrus"
+
+	"github.com/Scalingo/go-plugins-helpers/sdk"
 )
 
 const (
@@ -107,8 +109,8 @@ type Handler struct {
 }
 
 // NewHandler initializes the request handler with a plugin implementation.
-func NewHandler(plugin Plugin) *Handler {
-	h := &Handler{plugin, sdk.NewHandler(manifest)}
+func NewHandler(logger logrus.FieldLogger, plugin Plugin) *Handler {
+	h := &Handler{plugin, sdk.NewHandler(logger, manifest)}
 	h.initMux()
 	return h
 }
@@ -126,7 +128,7 @@ func (h *Handler) initMux() {
 type actionHandler func(Request) Response
 
 func (h *Handler) handle(name string, actionCall actionHandler) {
-	h.HandleFunc(name, func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc(name, func(w http.ResponseWriter, r *http.Request, _ map[string]string) error {
 		var (
 			req Request
 			d   = json.NewDecoder(r.Body)
@@ -139,5 +141,7 @@ func (h *Handler) handle(name string, actionCall actionHandler) {
 		res := actionCall(req)
 
 		sdk.EncodeResponse(w, res, res.Err != "")
+
+		return nil
 	})
 }
