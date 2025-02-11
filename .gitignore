@@ -23,4 +23,5 @@ _testmain.go
 *.test
 *.prof
 
-_dev/plugins
+/_dev/plugins
+/_dev/go-cache
