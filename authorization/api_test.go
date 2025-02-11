@@ -18,6 +18,8 @@ import (
 
 	"github.com/docker/go-plugins-helpers/sdk"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Scalingo/go-utils/logger"
 )
 
 type TestPlugin struct {
@@ -215,7 +217,7 @@ func callURL(url string) {
 
 func TestMain(m *testing.M) {
 	d := &TestPlugin{}
-	h := NewHandler(d)
+	h := NewHandler(logger.Default(), d)
 	go func() {
 		err := h.ServeTCP("test", "localhost:32456", "", nil)
 		if err != nil {

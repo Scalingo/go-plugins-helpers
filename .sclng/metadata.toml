@@ -2,6 +2,6 @@ dependencies = []
 description = "Go helper packages to extend the Docker Engine"
 flags = ["lib"]
 languages = ["go"]
-owner = "leo@scalingo.com"
+owner = "etienne@scalingo.com"
 team = "IST"
 version = "1.1.0"

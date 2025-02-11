@@ -7,7 +7,7 @@ updates:
     schedule:
       interval: "monthly"
     reviewers:
-      - "leo-scalingo"
+      - "EtienneM"
     groups:
       dependencies:
         patterns:
