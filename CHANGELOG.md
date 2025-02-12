@@ -2,7 +2,12 @@
 
 ## To Be Released
 
-* chore(go): use go 1.17
+## 1.4.0
+
+* chore(go): use go 1.23.5
+* build(deps): a lot of updates
+* refactor: match Scalingo best practices
+* Replace CodeShip with GitHub Actions
 
 ## 1.3.0
 
