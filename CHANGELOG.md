@@ -2,6 +2,8 @@
 
 ## To Be Released
 
+* feat: add error and content type middlewares
+
 ## 1.4.0
 
 * chore(go): use go 1.23.5
