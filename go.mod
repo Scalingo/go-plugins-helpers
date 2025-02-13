@@ -1,4 +1,4 @@
-module github.com/Scalingo/go-plugins-helpers
+module github.com/Scalingo/go-plugins-helpers/v2
 
 go 1.23.5
 

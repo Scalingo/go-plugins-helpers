@@ -2,6 +2,8 @@
 
 ## To Be Released
 
+* v2.0.0
+
 * feat: add error and content type middlewares
 * feat(sdk): introduce a `Manifest` type
 
