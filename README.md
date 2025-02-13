@@ -1,4 +1,4 @@
-# go-plugins-helpers v1.4.0
+# go-plugins-helpers v2.0.0
 
 A collection of helper packages to extend Docker Engine in Go
 
@@ -29,7 +29,7 @@ Bump new version number in:
 Commit, tag and create a new release:
 
 ```sh
-version="1.4.0"
+version="2.0.0"
 
 git switch --create release/${version}
 git add CHANGELOG.md README.md

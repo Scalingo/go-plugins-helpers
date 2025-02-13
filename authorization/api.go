@@ -8,7 +8,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/Scalingo/go-plugins-helpers/sdk"
+	"github.com/Scalingo/go-plugins-helpers/v2/sdk"
 )
 
 const (
