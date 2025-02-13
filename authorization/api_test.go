@@ -43,6 +43,8 @@ func (p *TestPlugin) AuthZRes(r Request) Response {
 }
 
 func TestActivate(t *testing.T) {
+	const expectedManifest = string(`{"Implements":["` + ImplementationName + `"]}`)
+
 	response, err := http.Get("http://localhost:32456/Plugin.Activate")
 	if err != nil {
 		t.Fatal(err)
@@ -54,9 +56,10 @@ func TestActivate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	bodyStr := strings.TrimSpace(string(body))
 
-	if string(body) != manifest+"\n" {
-		t.Fatalf("Expected %s, got %s\n", manifest+"\n", string(body))
+	if bodyStr != expectedManifest {
+		t.Fatalf("Expected '%s', got '%s'\n", expectedManifest, bodyStr)
 	}
 }
 

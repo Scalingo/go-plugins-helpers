@@ -3,6 +3,7 @@
 ## To Be Released
 
 * feat: add error and content type middlewares
+* feat(sdk): introduce a `Manifest` type
 
 ## 1.4.0
 

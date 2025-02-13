@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	manifest = `{"Implements": ["IpamDriver"]}`
+	// ImplementationName is the name of the interface all IPAM plugins implement
+	ImplementationName sdk.DriverImplementationName = "IpamDriver"
 
 	capabilitiesPath   = "/IpamDriver.GetCapabilities"
 	addressSpacesPath  = "/IpamDriver.GetDefaultAddressSpaces"
@@ -90,7 +91,9 @@ type Handler struct {
 
 // NewHandler initializes the request handler with a driver implementation.
 func NewHandler(logger logrus.FieldLogger, driver Ipam) *Handler {
-	h := &Handler{driver, sdk.NewHandler(logger, manifest)}
+	h := &Handler{driver, sdk.NewHandler(logger, sdk.Manifest{
+		Implements: []sdk.DriverImplementationName{ImplementationName},
+	})}
 	h.initMux()
 	return h
 }

@@ -2,7 +2,6 @@ package sdk
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -20,16 +19,22 @@ type Handler struct {
 	mux *handlers.Router
 }
 
+type DriverImplementationName string
+
+type Manifest struct {
+	Implements []DriverImplementationName `json:"Implements"`
+}
+
 // NewHandler creates a new Handler with an http mux.
 // It configures a single default route for the plugin activation and adds a bunch of middlewares.
-func NewHandler(logger logrus.FieldLogger, manifest string) Handler {
+func NewHandler(logger logrus.FieldLogger, manifest Manifest) Handler {
 	mux := handlers.NewRouter(logger)
 	mux.Use(handlers.ErrorMiddleware)
 	mux.Use(errorMiddleware)
 	mux.Use(contentTypeMiddleware)
 
 	mux.HandleFunc(activatePath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
-		fmt.Fprintln(w, manifest)
+		EncodeResponse(w, manifest)
 		return nil
 	})
 
