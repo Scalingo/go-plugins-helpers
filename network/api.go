@@ -12,7 +12,9 @@ import (
 )
 
 const (
-	manifest = `{"Implements": ["NetworkDriver"]}`
+	// ImplementationName is the name of the interface all network plugins implement
+	ImplementationName sdk.DriverImplementationName = "NetworkDriver"
+
 	// LocalScope is the correct scope response for a local scope driver
 	LocalScope = `local`
 	// GlobalScope is the correct scope response for a global scope driver
@@ -208,7 +210,9 @@ type Handler struct {
 
 // NewHandler initializes the request handler with a driver implementation.
 func NewHandler(logger logrus.FieldLogger, driver Driver) *Handler {
-	h := &Handler{driver, sdk.NewHandler(logger, manifest)}
+	h := &Handler{driver, sdk.NewHandler(logger, sdk.Manifest{
+		Implements: []sdk.DriverImplementationName{ImplementationName},
+	})}
 	h.initMux()
 	return h
 }

@@ -18,12 +18,11 @@ const (
 	// AuthZApiResponse is the url for daemon response authorization
 	AuthZApiResponse = "AuthZPlugin.AuthZRes"
 
-	// AuthZApiImplements is the name of the interface all AuthZ plugins implement
-	AuthZApiImplements = "authz"
+	// ImplementationName is the name of the interface all AuthZ plugins implement
+	ImplementationName sdk.DriverImplementationName = "authz"
 
-	manifest = `{"Implements": ["` + AuthZApiImplements + `"]}`
-	reqPath  = "/" + AuthZApiRequest
-	resPath  = "/" + AuthZApiResponse
+	reqPath = "/" + AuthZApiRequest
+	resPath = "/" + AuthZApiResponse
 )
 
 // PeerCertificate is a wrapper around x509.Certificate which provides a sane
@@ -110,7 +109,9 @@ type Handler struct {
 
 // NewHandler initializes the request handler with a plugin implementation.
 func NewHandler(logger logrus.FieldLogger, plugin Plugin) *Handler {
-	h := &Handler{plugin, sdk.NewHandler(logger, manifest)}
+	h := &Handler{plugin, sdk.NewHandler(logger, sdk.Manifest{
+		Implements: []sdk.DriverImplementationName{ImplementationName},
+	})}
 	h.initMux()
 	return h
 }
