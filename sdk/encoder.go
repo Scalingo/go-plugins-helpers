@@ -19,17 +19,12 @@ func DecodeRequest(w http.ResponseWriter, r *http.Request, req interface{}) (err
 }
 
 // EncodeResponse encodes the given structure into an http response.
-func EncodeResponse(w http.ResponseWriter, res interface{}, err bool) {
-	w.Header().Set("Content-Type", DefaultContentTypeV1_1)
-	if err {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
+func EncodeResponse(w http.ResponseWriter, res interface{}) {
 	json.NewEncoder(w).Encode(res)
 }
 
 // StreamResponse streams a response object to the client
 func StreamResponse(w http.ResponseWriter, data io.ReadCloser) {
-	w.Header().Set("Content-Type", DefaultContentTypeV1_1)
 	if _, err := copyBuf(w, data); err != nil {
 		fmt.Printf("ERROR in stream: %v\n", err)
 	}

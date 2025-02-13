@@ -82,16 +82,6 @@ type ReleaseAddressRequest struct {
 	Address string
 }
 
-// ErrorResponse is a formatted error message that libnetwork can understand
-type ErrorResponse struct {
-	Err string
-}
-
-// NewErrorResponse creates an ErrorResponse with the provided message
-func NewErrorResponse(msg string) *ErrorResponse {
-	return &ErrorResponse{Err: msg}
-}
-
 // Handler forwards requests and responses between the docker daemon and the plugin.
 type Handler struct {
 	ipam Ipam
@@ -115,19 +105,17 @@ func (h *Handler) initMux() {
 	h.HandleFunc(capabilitiesPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		res, err := h.ipam.GetCapabilities(r.Context())
 		if err != nil {
-			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
 			return err
 		}
-		sdk.EncodeResponse(w, res, false)
+		sdk.EncodeResponse(w, res)
 		return nil
 	})
 	h.HandleFunc(addressSpacesPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
 		res, err := h.ipam.GetDefaultAddressSpaces(r.Context())
 		if err != nil {
-			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
 			return err
 		}
-		sdk.EncodeResponse(w, res, false)
+		sdk.EncodeResponse(w, res)
 		return nil
 	})
 	h.HandleFunc(requestPoolPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
@@ -143,10 +131,9 @@ func (h *Handler) initMux() {
 		}))
 		res, err := h.ipam.RequestPool(ctx, req)
 		if err != nil {
-			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
 			return err
 		}
-		sdk.EncodeResponse(w, res, false)
+		sdk.EncodeResponse(w, res)
 		return nil
 	})
 	h.HandleFunc(releasePoolPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
@@ -160,10 +147,9 @@ func (h *Handler) initMux() {
 		}))
 		err = h.ipam.ReleasePool(ctx, req)
 		if err != nil {
-			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
 			return err
 		}
-		sdk.EncodeResponse(w, struct{}{}, false)
+		sdk.EncodeResponse(w, struct{}{})
 		return nil
 	})
 	h.HandleFunc(requestAddressPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
@@ -178,10 +164,9 @@ func (h *Handler) initMux() {
 		}))
 		res, err := h.ipam.RequestAddress(ctx, req)
 		if err != nil {
-			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
 			return err
 		}
-		sdk.EncodeResponse(w, res, false)
+		sdk.EncodeResponse(w, res)
 		return nil
 	})
 	h.HandleFunc(releaseAddressPath, func(w http.ResponseWriter, r *http.Request, p map[string]string) error {
@@ -196,10 +181,9 @@ func (h *Handler) initMux() {
 		}))
 		err = h.ipam.ReleaseAddress(ctx, req)
 		if err != nil {
-			sdk.EncodeResponse(w, NewErrorResponse(err.Error()), true)
 			return err
 		}
-		sdk.EncodeResponse(w, struct{}{}, false)
+		sdk.EncodeResponse(w, struct{}{})
 		return nil
 	})
 }
