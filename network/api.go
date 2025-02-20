@@ -96,9 +96,15 @@ type FreeNetworkRequest struct {
 // CreateNetworkRequest is sent by the daemon when a network needs to be created
 type CreateNetworkRequest struct {
 	NetworkID string
-	Options   map[string]interface{}
+	Options   CreateNetworkRequestOptions
 	IPv4Data  []*IPAMData
 	IPv6Data  []*IPAMData
+}
+
+type CreateNetworkRequestOptions struct {
+	Generic    map[string]string `json:"com.docker.network.generic"`
+	EnableIPv4 bool              `json:"com.docker.network.enable_ipv4"`
+	EnableIPv6 bool              `json:"com.docker.network.enable_ipv6"`
 }
 
 // IPAMData contains IPv4 or IPv6 addressing information
