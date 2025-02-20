@@ -4,14 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/urfave/negroni/v3"
+
 	"github.com/Scalingo/go-handlers"
 )
 
 // contentTypeMiddleware sets the HTTP header `Content-Type` to the content type accepted and sent by Docker plugins
 var contentTypeMiddleware = handlers.MiddlewareFunc(func(handler handlers.HandlerFunc) handlers.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, vars map[string]string) error {
-		w.Header().Set("Content-Type", DefaultContentTypeV1_1)
-		return handler(w, r, vars)
+		rw := negroni.NewResponseWriter(w)
+		rw.Header().Set("Content-Type", DefaultContentTypeV1_1)
+		return handler(rw, r, vars)
 	}
 })
 
@@ -28,9 +31,13 @@ func NewErrorResponse(err error) ErrorResponse {
 // errorMiddleware encodes in JSON the error returned by the handler to the HTTP request body
 var errorMiddleware = handlers.MiddlewareFunc(func(handler handlers.HandlerFunc) handlers.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, vars map[string]string) error {
-		err := handler(w, r, vars)
+		rw := negroni.NewResponseWriter(w)
+		err := handler(rw, r, vars)
 		if err != nil {
-			json.NewEncoder(w).Encode(NewErrorResponse(err))
+			if rw.Status() == 0 {
+				rw.WriteHeader(http.StatusInternalServerError)
+			}
+			json.NewEncoder(rw).Encode(NewErrorResponse(err))
 			return err
 		}
 
