@@ -179,7 +179,7 @@ func TestCapabilitiesExchange(t *testing.T) {
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
 
-	expected := `{"Scope":"local","ConnectivityScope":"global"}`
+	expected := `{"Scope":"local","ConnectivityScope":"global","GwAllocChecker":false}`
 	if string(body) != expected+"\n" {
 		t.Fatalf("Expected %s, got %s\n", expected+"\n", string(body))
 	}

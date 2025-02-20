@@ -15,11 +15,6 @@ const (
 	// ImplementationName is the name of the interface all network plugins implement
 	ImplementationName sdk.DriverImplementationName = "NetworkDriver"
 
-	// LocalScope is the correct scope response for a local scope driver
-	LocalScope = `local`
-	// GlobalScope is the correct scope response for a global scope driver
-	GlobalScope = `global`
-
 	capabilitiesPath    = "/NetworkDriver.GetCapabilities"
 	allocateNetworkPath = "/NetworkDriver.AllocateNetwork"
 	freeNetworkPath     = "/NetworkDriver.FreeNetwork"
@@ -38,6 +33,8 @@ const (
 
 // Driver represent the interface a driver must fulfill.
 type Driver interface {
+	// GetCapabilities returns the driver capabilities
+	// https://github.com/moby/moby/blob/master/libnetwork/docs/remote.md#set-capability
 	GetCapabilities(context.Context) (*CapabilitiesResponse, error)
 	CreateNetwork(context.Context, *CreateNetworkRequest) error
 	AllocateNetwork(context.Context, *AllocateNetworkRequest) (*AllocateNetworkResponse, error)
@@ -54,10 +51,20 @@ type Driver interface {
 	RevokeExternalConnectivity(context.Context, *RevokeExternalConnectivityRequest) error
 }
 
+type CapabilitiesResponseScope string
+
+const (
+	// LocalScope is the correct scope response for a local scope driver
+	LocalScope CapabilitiesResponseScope = "local"
+	// GlobalScope is the correct scope response for a global scope driver
+	GlobalScope CapabilitiesResponseScope = "global"
+)
+
 // CapabilitiesResponse returns whether or not this network is global or local
 type CapabilitiesResponse struct {
-	Scope             string
-	ConnectivityScope string
+	Scope             CapabilitiesResponseScope
+	ConnectivityScope CapabilitiesResponseScope
+	GwAllocChecker    bool
 }
 
 // AllocateNetworkRequest requests allocation of new network by manager
