@@ -100,6 +100,7 @@ func (h Handler) ServeWindows(addr, pluginName, daemonDir string, pipeConfig *Wi
 }
 
 // Use adds a middleware at the beginning of the middleware stack. The lastly added middleware is called first.
+// All the middlewares MUST wrap the `http.ResponseWriter` into a `negroni.ResponseWriter` so that one can call `ResponseWriter.Status()` and `ResponseWriter.Size()` in the various middlewares.
 func (h Handler) Use(m handlers.Middleware) {
 	h.mux.Use(m)
 }
