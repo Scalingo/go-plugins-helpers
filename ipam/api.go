@@ -34,7 +34,8 @@ type Ipam interface {
 
 // CapabilitiesResponse returns whether or not this IPAM required pre-made MAC
 type CapabilitiesResponse struct {
-	RequiresMACAddress bool
+	RequiresMACAddress    bool
+	RequiresRequestReplay bool
 }
 
 // AddressSpacesResponse returns the default local and global address space names for this IPAM
