@@ -2,7 +2,11 @@
 
 ## To Be Released
 
-* v2.0.0
+* fix: makes the CI pass
+* feat(network): add missing fields to network and IPAM `CapabilitiesResponse`
+* feat(network): add type `CreateNetworkRequestOptions`
+
+## v2.0.0
 
 * feat: add error and content type middlewares
 * feat(sdk): introduce a `Manifest` type
