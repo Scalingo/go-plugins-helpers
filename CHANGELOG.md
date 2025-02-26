@@ -2,6 +2,8 @@
 
 ## To Be Released
 
+## v2.1.0
+
 * fix: makes the CI pass
 * feat(network): add missing fields to network and IPAM `CapabilitiesResponse`
 * feat(network): add type `CreateNetworkRequestOptions`
