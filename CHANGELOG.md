@@ -2,6 +2,10 @@
 
 ## To Be Released
 
+## v2.2.0
+
+* feat(ipam): add type `RequestAddressRequestOptions`
+
 ## v2.1.0
 
 * fix: makes the CI pass
