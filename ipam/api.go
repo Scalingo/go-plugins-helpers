@@ -69,8 +69,18 @@ type ReleasePoolRequest struct {
 type RequestAddressRequest struct {
 	PoolID  string
 	Address string
-	Options map[string]string
+	Options RequestAddressRequestOptions
 }
+
+type RequestAddressRequestOptions struct {
+	RequestAddressType RequestAddressType `json:"RequestAddressType"`
+}
+
+type RequestAddressType string
+
+const (
+	RequestAddressTypeGateway RequestAddressType = "com.docker.network.gateway"
+)
 
 // RequestAddressResponse is formed with allocated address by IPAM
 type RequestAddressResponse struct {
