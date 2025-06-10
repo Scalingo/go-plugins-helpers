@@ -2,6 +2,8 @@
 
 ## To Be Released
 
+* chore(go): use go 1.24
+
 ## v2.2.0
 
 * feat(ipam): add type `RequestAddressRequestOptions`
