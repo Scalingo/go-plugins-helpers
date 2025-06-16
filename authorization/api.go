@@ -30,7 +30,7 @@ const (
 type PeerCertificate x509.Certificate
 
 // MarshalJSON returns the JSON encoded pem bytes of a PeerCertificate.
-func (pc *PeerCertificate) MarshalJSON() ([]byte, error) {
+func (pc PeerCertificate) MarshalJSON() ([]byte, error) {
 	b := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: pc.Raw})
 	return json.Marshal(b)
 }
