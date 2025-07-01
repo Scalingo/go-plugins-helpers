@@ -1,8 +1,6 @@
 module github.com/Scalingo/go-plugins-helpers/v2
 
-go 1.24
-
-toolchain go1.24.1
+go 1.24.3
 
 require (
 	github.com/Microsoft/go-winio v0.6.2
@@ -11,16 +9,16 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/docker/go-connections v0.5.0
 	github.com/docker/go-plugins-helpers v0.0.0-20240701071450-45e2431495c8
-	github.com/moby/moby v28.2.2+incompatible
+	github.com/moby/moby v28.3.0+incompatible
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/negroni/v3 v3.1.1
 )
 
 require (
-	github.com/Scalingo/go-utils/crypto v1.1.0 // indirect
-	github.com/Scalingo/go-utils/errors/v2 v2.5.0 // indirect
-	github.com/Scalingo/go-utils/security v1.1.0 // indirect
+	github.com/Scalingo/go-utils/crypto v1.1.1 // indirect
+	github.com/Scalingo/go-utils/errors/v2 v2.5.1 // indirect
+	github.com/Scalingo/go-utils/security v1.1.1 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/frankban/quicktest v1.14.6 // indirect
