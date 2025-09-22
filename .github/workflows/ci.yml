@@ -32,7 +32,7 @@ jobs:
         run: wget --output-document=$(pwd)/.golangci.yml https://sc-devtools.s3.eu-west-1.amazonaws.com/golang-ci/golangci.yml
       - name: Get master branch commit ID
         id: new-from-rev
-        run: echo "NEW_FROM_REV=$( git rev-parse origin/master )" >> "$GITHUB_OUTPUT"
+        run: echo "NEW_FROM_REV=$( git show-branch --merge-base FETCH_HEAD )" >> "$GITHUB_OUTPUT"
       - name: "Execute golangci-lint on a pull request"
         uses: golangci/golangci-lint-action@v6
         with:
