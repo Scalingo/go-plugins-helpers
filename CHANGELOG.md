@@ -2,6 +2,10 @@
 
 ## To Be Released
 
+# v2.4.0
+
+* fix(ci): fix erroneous CI pipeline
+* build(deps): several dependabot updates
 
 ## v2.3.0
 
