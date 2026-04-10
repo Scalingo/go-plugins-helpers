@@ -2,6 +2,13 @@
 
 ## To Be Released
 
+# v2.5.0
+
+* build(workflows): use the Scalingo actions
+* build(deps): update GitHub Actions and Go module dependencies
+* chore(go): use go 1.25
+* docs(readme): set the release reviewer to `Scalingo/team-ist`
+
 # v2.4.0
 
 * fix(ci): fix erroneous CI pipeline
