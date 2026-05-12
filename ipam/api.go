@@ -24,12 +24,12 @@ const (
 
 // Ipam represent the interface a driver must fulfill.
 type Ipam interface {
-	GetCapabilities(context.Context) (*CapabilitiesResponse, error)
-	GetDefaultAddressSpaces(context.Context) (*AddressSpacesResponse, error)
-	RequestPool(context.Context, *RequestPoolRequest) (*RequestPoolResponse, error)
-	ReleasePool(context.Context, *ReleasePoolRequest) error
-	RequestAddress(context.Context, *RequestAddressRequest) (*RequestAddressResponse, error)
-	ReleaseAddress(context.Context, *ReleaseAddressRequest) error
+	GetCapabilities(ctx context.Context) (*CapabilitiesResponse, error)
+	GetDefaultAddressSpaces(ctx context.Context) (*AddressSpacesResponse, error)
+	RequestPool(ctx context.Context, req *RequestPoolRequest) (*RequestPoolResponse, error)
+	ReleasePool(ctx context.Context, req *ReleasePoolRequest) error
+	RequestAddress(ctx context.Context, req *RequestAddressRequest) (*RequestAddressResponse, error)
+	ReleaseAddress(ctx context.Context, req *ReleaseAddressRequest) error
 }
 
 // CapabilitiesResponse returns whether or not this IPAM required pre-made MAC

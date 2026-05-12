@@ -35,20 +35,20 @@ const (
 type Driver interface {
 	// GetCapabilities returns the driver capabilities
 	// https://github.com/moby/moby/blob/master/libnetwork/docs/remote.md#set-capability
-	GetCapabilities(context.Context) (*CapabilitiesResponse, error)
-	CreateNetwork(context.Context, *CreateNetworkRequest) error
-	AllocateNetwork(context.Context, *AllocateNetworkRequest) (*AllocateNetworkResponse, error)
-	DeleteNetwork(context.Context, *DeleteNetworkRequest) error
-	FreeNetwork(context.Context, *FreeNetworkRequest) error
-	CreateEndpoint(context.Context, *CreateEndpointRequest) (*CreateEndpointResponse, error)
-	DeleteEndpoint(context.Context, *DeleteEndpointRequest) error
-	EndpointInfo(context.Context, *InfoRequest) (*InfoResponse, error)
-	Join(context.Context, *JoinRequest) (*JoinResponse, error)
-	Leave(context.Context, *LeaveRequest) error
-	DiscoverNew(context.Context, *DiscoveryNotification) error
-	DiscoverDelete(context.Context, *DiscoveryNotification) error
-	ProgramExternalConnectivity(context.Context, *ProgramExternalConnectivityRequest) error
-	RevokeExternalConnectivity(context.Context, *RevokeExternalConnectivityRequest) error
+	GetCapabilities(ctx context.Context) (*CapabilitiesResponse, error)
+	CreateNetwork(ctx context.Context, req *CreateNetworkRequest) error
+	AllocateNetwork(ctx context.Context, req *AllocateNetworkRequest) (*AllocateNetworkResponse, error)
+	DeleteNetwork(ctx context.Context, req *DeleteNetworkRequest) error
+	FreeNetwork(ctx context.Context, req *FreeNetworkRequest) error
+	CreateEndpoint(ctx context.Context, req *CreateEndpointRequest) (*CreateEndpointResponse, error)
+	DeleteEndpoint(ctx context.Context, req *DeleteEndpointRequest) error
+	EndpointInfo(ctx context.Context, req *InfoRequest) (*InfoResponse, error)
+	Join(ctx context.Context, req *JoinRequest) (*JoinResponse, error)
+	Leave(ctx context.Context, req *LeaveRequest) error
+	DiscoverNew(ctx context.Context, req *DiscoveryNotification) error
+	DiscoverDelete(ctx context.Context, req *DiscoveryNotification) error
+	ProgramExternalConnectivity(ctx context.Context, req *ProgramExternalConnectivityRequest) error
+	RevokeExternalConnectivity(ctx context.Context, req *RevokeExternalConnectivityRequest) error
 }
 
 type CapabilitiesResponseScope string
@@ -243,7 +243,7 @@ func (h *Handler) initMux() {
 			return err
 		}
 		if res == nil {
-			return errors.New("Network driver must implement GetCapabilities")
+			return errors.New("network driver must implement GetCapabilities")
 		}
 		sdk.EncodeResponse(w, res)
 		return nil
