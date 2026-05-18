@@ -2,6 +2,10 @@
 
 ## To Be Released
 
+# v2.5.1
+
+* build(deps): various Dependabot updates
+
 # v2.5.0
 
 * build(workflows): use the Scalingo actions
