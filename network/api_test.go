@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/docker/go-plugins-helpers/sdk"
-	"github.com/sirupsen/logrus"
 
 	"github.com/Scalingo/go-utils/logger"
 )
@@ -126,7 +125,7 @@ func callURL(url string) {
 
 func TestMain(m *testing.M) {
 	d := &TestDriver{}
-	h1 := NewHandler(logrus.FieldLogger(logger.Default()), d)
+	h1 := NewHandler(logger.Default(), d)
 	go func() {
 		err := h1.ServeTCP("test", "localhost:32234", "", nil)
 		if err != nil {
@@ -136,7 +135,7 @@ func TestMain(m *testing.M) {
 	}()
 
 	e := &ErrDriver{}
-	h2 := NewHandler(logrus.FieldLogger(logger.Default()), e)
+	h2 := NewHandler(logger.Default(), e)
 	go func() {
 		err := h2.ServeTCP("test", "localhost:32567", "", nil)
 		if err != nil {

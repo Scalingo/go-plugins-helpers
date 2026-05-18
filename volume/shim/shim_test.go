@@ -8,7 +8,7 @@ import (
 
 	"github.com/docker/go-connections/sockets"
 	volumeplugin "github.com/docker/go-plugins-helpers/volume"
-	"github.com/moby/moby/volume"
+	"github.com/moby/moby/v2/daemon/volume"
 )
 
 type testVolumeDriver struct{}
