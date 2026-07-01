@@ -1,6 +1,6 @@
 module github.com/Scalingo/go-plugins-helpers/v2
 
-go 1.25.5
+go 1.25.9
 
 require (
 	github.com/Microsoft/go-winio v0.6.2
@@ -9,7 +9,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.7.0
 	github.com/docker/go-connections v0.7.0
 	github.com/docker/go-plugins-helpers v0.0.0-20240701071450-45e2431495c8
-	github.com/moby/moby/v2 v2.0.0-beta.15
+	github.com/moby/moby/v2 v2.0.0-beta.18
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/negroni/v3 v3.1.1
@@ -23,7 +23,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/felixge/httpsnoop v1.0.4 // indirect
+	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/frankban/quicktest v1.14.6 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -36,7 +36,7 @@ require (
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/metric v1.44.0 // indirect
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
-	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
 	gopkg.in/errgo.v1 v1.0.1 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
