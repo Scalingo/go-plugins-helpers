@@ -2,6 +2,8 @@
 
 ## To Be Released
 
+* build(go): upgrade to Go 1.27.3
+
 # v2.5.1
 
 * build(deps): various Dependabot updates
